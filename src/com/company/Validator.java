@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.regex.Pattern;
 
 public class Validator {
@@ -18,10 +20,30 @@ public class Validator {
     }
 
     public boolean isValid() {
-        if (!Pattern.matches("^[a-z+\\-/*() ]*$", expression)) {
-            return false;
-        } else if (!expression.matches("^[a-z\\-(]|.*[+*\\-/()]+.*")) {
-            return false;
-        } else return expression.matches("^[a-z\\-(]|[a-z\\-(]+.*[a-z)]");
+        if (expression.contains("(")) {
+            boolean parenthesis = checkParenthesis();
+            if (!parenthesis) return false;
+        }
+
+        return Pattern.matches("^[a-z+\\-/*() ]*$", expression)
+                && expression.matches("^[a-z\\-(]|.*[+*\\-/()]+.*")
+                && expression.matches("^[a-z\\-(]|[a-z\\-(]+.*[a-z)]");
+    }
+
+    public boolean checkParenthesis() {
+        Deque<Character> checker = new ArrayDeque<>();
+
+        for (int i = 0; i < expression.length(); i++) {
+            char x = expression.charAt(i);
+
+            if (x == '(') {
+                checker.push(x);
+                continue;
+            }
+
+            if (x == ')' && checker.isEmpty()) return false;
+            if (x == ')') checker.pop();
+        }
+        return checker.isEmpty();
     }
 }
